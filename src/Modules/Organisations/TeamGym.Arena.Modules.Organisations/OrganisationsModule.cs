@@ -21,13 +21,17 @@ public static class OrganisationsModule
         return services;
     }
 
-    /// <summary>Maps the endpoints of the Organisations module. Feature slices add their endpoints to this group.</summary>
-    public static IEndpointRouteBuilder MapOrganisationsEndpoints(this IEndpointRouteBuilder endpoints)
+    /// <summary>
+    /// Maps the endpoints of the Organisations module under <see cref="RoutePrefix"/>. Feature slices map their endpoints
+    /// on this group, so every module-wide convention applies to them.
+    /// </summary>
+    /// <returns>The route group of the module.</returns>
+    public static RouteGroupBuilder MapOrganisationsEndpoints(this IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        endpoints.MapGroup(RoutePrefix).WithTags("Organisations");
+        var group = endpoints.MapGroup(RoutePrefix).WithTags("Organisations");
 
-        return endpoints;
+        return group;
     }
 }

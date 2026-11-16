@@ -21,13 +21,17 @@ public static class CompetitionsModule
         return services;
     }
 
-    /// <summary>Maps the endpoints of the Competitions module. Feature slices add their endpoints to this group.</summary>
-    public static IEndpointRouteBuilder MapCompetitionsEndpoints(this IEndpointRouteBuilder endpoints)
+    /// <summary>
+    /// Maps the endpoints of the Competitions module under <see cref="RoutePrefix"/>. Feature slices map their endpoints
+    /// on this group, so every module-wide convention applies to them.
+    /// </summary>
+    /// <returns>The route group of the module.</returns>
+    public static RouteGroupBuilder MapCompetitionsEndpoints(this IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        endpoints.MapGroup(RoutePrefix).WithTags("Competitions");
+        var group = endpoints.MapGroup(RoutePrefix).WithTags("Competitions");
 
-        return endpoints;
+        return group;
     }
 }

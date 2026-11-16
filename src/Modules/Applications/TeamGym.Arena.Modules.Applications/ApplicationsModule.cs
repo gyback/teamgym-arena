@@ -21,13 +21,17 @@ public static class ApplicationsModule
         return services;
     }
 
-    /// <summary>Maps the endpoints of the Applications module. Feature slices add their endpoints to this group.</summary>
-    public static IEndpointRouteBuilder MapApplicationsEndpoints(this IEndpointRouteBuilder endpoints)
+    /// <summary>
+    /// Maps the endpoints of the Applications module under <see cref="RoutePrefix"/>. Feature slices map their endpoints
+    /// on this group, so every module-wide convention applies to them.
+    /// </summary>
+    /// <returns>The route group of the module.</returns>
+    public static RouteGroupBuilder MapApplicationsEndpoints(this IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        endpoints.MapGroup(RoutePrefix).WithTags("Applications");
+        var group = endpoints.MapGroup(RoutePrefix).WithTags("Applications");
 
-        return endpoints;
+        return group;
     }
 }
