@@ -35,6 +35,15 @@ public sealed class StronglyTypedIdTests
         Assert.True(earlier.Value.CompareTo(later.Value) < 0);
     }
 
+    [Fact]
+    public void IdsCreatedAtTheSameTimeAreDistinct()
+    {
+        var first = StronglyTypedId.New<SampleId>(_timeProvider);
+        var second = StronglyTypedId.New<SampleId>(_timeProvider);
+
+        Assert.NotEqual(first, second);
+    }
+
     private readonly record struct SampleId(Guid Value) : IStronglyTypedId<SampleId>
     {
         public static SampleId From(Guid value) => new(value);
