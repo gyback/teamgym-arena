@@ -97,12 +97,13 @@ public static class ServiceDefaultsExtensions
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        app.MapHealthChecks(HealthEndpointPath);
+        // The platform probes are anonymous (on the ADR-0008 allow-list).
+        app.MapHealthChecks(HealthEndpointPath).AllowAnonymous();
 
         app.MapHealthChecks(AlivenessEndpointPath, new HealthCheckOptions
         {
             Predicate = registration => registration.Tags.Contains(LiveTag),
-        });
+        }).AllowAnonymous();
 
         return app;
     }

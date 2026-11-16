@@ -30,7 +30,10 @@ public static class CompetitionsModule
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        var group = endpoints.MapGroup(RoutePrefix).WithTags("Competitions");
+        // Every endpoint requires an authenticated user; public endpoints opt out with AllowAnonymous().
+        var group = endpoints.MapGroup(RoutePrefix)
+            .WithTags("Competitions")
+            .RequireAuthorization();
 
         return group;
     }

@@ -30,7 +30,10 @@ public static class SchedulingModule
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        var group = endpoints.MapGroup(RoutePrefix).WithTags("Scheduling");
+        // Every endpoint requires an authenticated user; public endpoints opt out with AllowAnonymous().
+        var group = endpoints.MapGroup(RoutePrefix)
+            .WithTags("Scheduling")
+            .RequireAuthorization();
 
         return group;
     }

@@ -30,7 +30,10 @@ public static class UsersModule
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        var group = endpoints.MapGroup(RoutePrefix).WithTags("Users");
+        // Every endpoint requires an authenticated user; public endpoints opt out with AllowAnonymous().
+        var group = endpoints.MapGroup(RoutePrefix)
+            .WithTags("Users")
+            .RequireAuthorization();
 
         return group;
     }

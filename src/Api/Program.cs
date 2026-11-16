@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 
@@ -29,6 +30,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseAuthorization();
 
 app.MapDefaultEndpoints();
 
