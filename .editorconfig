@@ -29,13 +29,35 @@ csharp_style_var_for_built_in_types = true:suggestion
 csharp_style_var_when_type_is_apparent = true:suggestion
 csharp_style_var_elsewhere = true:suggestion
 
-# Naming: private and internal instance fields use _camelCase
+# Naming. Rules are listed from most to least specific, because .editorconfig
+# applies the first naming rule whose symbols match.
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.begins_with_s_underscore.capitalization = camel_case
+dotnet_naming_style.begins_with_s_underscore.required_prefix = s_
 dotnet_naming_style.begins_with_underscore.capitalization = camel_case
 dotnet_naming_style.begins_with_underscore.required_prefix = _
+
+# Constants use PascalCase
+dotnet_naming_symbols.constant_fields.applicable_kinds = field
+dotnet_naming_symbols.constant_fields.applicable_accessibilities = *
+dotnet_naming_symbols.constant_fields.required_modifiers = const
+dotnet_naming_rule.constant_fields_should_be_pascal_case.severity = warning
+dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols = constant_fields
+dotnet_naming_rule.constant_fields_should_be_pascal_case.style = pascal_case
+
+# Private and internal static fields use s_camelCase
+dotnet_naming_symbols.private_static_fields.applicable_kinds = field
+dotnet_naming_symbols.private_static_fields.applicable_accessibilities = private, internal, private_protected
+dotnet_naming_symbols.private_static_fields.required_modifiers = static
+dotnet_naming_rule.private_static_fields_should_be_s_camel_case.severity = warning
+dotnet_naming_rule.private_static_fields_should_be_s_camel_case.symbols = private_static_fields
+dotnet_naming_rule.private_static_fields_should_be_s_camel_case.style = begins_with_s_underscore
+
+# Private and internal instance fields use _camelCase
 dotnet_naming_symbols.private_instance_fields.applicable_kinds = field
-dotnet_naming_symbols.private_instance_fields.applicable_accessibilities = private, private_protected
-dotnet_naming_symbols.private_instance_fields.required_modifiers =
-dotnet_naming_rule.private_fields_should_be_camel_case.severity = warning
-dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_instance_fields
-dotnet_naming_rule.private_fields_should_be_camel_case.style = begins_with_underscore
+dotnet_naming_symbols.private_instance_fields.applicable_accessibilities = private, internal, private_protected
+dotnet_naming_rule.private_instance_fields_should_be_camel_case.severity = warning
+dotnet_naming_rule.private_instance_fields_should_be_camel_case.symbols = private_instance_fields
+dotnet_naming_rule.private_instance_fields_should_be_camel_case.style = begins_with_underscore
+
 dotnet_diagnostic.IDE1006.severity = warning
