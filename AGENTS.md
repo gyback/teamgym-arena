@@ -135,8 +135,8 @@ The architecture tests enforce most of these. Breaking one is an ADR question, n
 
 ## Commands
 
-Run all of these before opening or updating a pull request. CI runs the same checks
-([ADR-0003](docs/adr/0003-engineering-workflow-and-quality-gates.md)).
+Run all of these before opening or updating a pull request. CI (`.github/workflows/ci.yml`) runs the same
+checks ([ADR-0003](docs/adr/0003-engineering-workflow-and-quality-gates.md)).
 
 | Purpose | Command |
 | --- | --- |
@@ -146,6 +146,7 @@ Run all of these before opening or updating a pull request. CI runs the same che
 | Run backend tests (needs Docker for Testcontainers) | `dotnet test` |
 | Install frontend dependencies | `npm ci` (in `src/Web`) |
 | Type-check, lint and format-check the frontend | `tsc --noEmit`, ESLint (zero warnings) and `prettier --check` (in `src/Web`) |
+| Run frontend unit and component tests | `npx vitest run --coverage` (in `src/Web`) |
 | Build the frontend | `npm run build` (in `src/Web`) |
 
 The scaffolding PRs replace the frontend row with the exact `npm run` script names.

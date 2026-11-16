@@ -93,7 +93,8 @@ These messages drive automated versioning and changelogs
 
 ## Quality checks
 
-CI runs these on every pull request and blocks merging on any failure. Run them locally first:
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs these on every pull request and blocks
+merging on any failure. Run them locally first:
 
 ```shell
 dotnet build                         # warnings are errors
@@ -108,6 +109,7 @@ npm ci
 npx tsc --noEmit                     # strict type check
 npx eslint . --max-warnings 0        # lint with zero warnings
 npx prettier --check .               # formatting
+npx vitest run --coverage            # unit and component tests
 npm run build
 ```
 

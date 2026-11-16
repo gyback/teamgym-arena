@@ -1,0 +1,194 @@
+# Continuous integration quality gates (ADR-0003, CI quality gates and testing strategy).
+# Runs on every pull request to main and on every push to main. Every job must
+# pass before a pull request can merge. The pull request title is checked in
+# pr-title.yml, because title edits must not re-run (or skip) these jobs.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+# The job names are required status checks in the main branch ruleset.
+# Renaming them breaks the ruleset until it is updated to match.
+jobs:
+  dotnet:
+    name: .NET build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore tools
+        run: dotnet tool restore
+
+      - name: Restore
+        run: dotnet restore
+
+      # Warnings are errors through Directory.Build.props.
+      - name: Build
+        run: dotnet build --no-restore --configuration Release -p:ContinuousIntegrationBuild=true
+
+      - name: Check formatting
+        run: dotnet format --verify-no-changes --no-restore
+
+      # Unit, integration (Testcontainers on the runner's Docker engine) and
+      # architecture tests are all part of the solution.
+      - name: Test
+        run: >-
+          dotnet test --no-build --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory TestResults
+          --logger trx
+
+      # Coverage is informational: it is reported, never gated (ADR-0003).
+      - name: Summarise coverage
+        if: ${{ !cancelled() }}
+        run: |
+          if [ -z "$(find TestResults -name 'coverage.cobertura.xml' -print -quit 2>/dev/null)" ]; then
+            echo "::notice::No .NET coverage reports found; skipping the coverage summary."
+            exit 0
+          fi
+          dotnet reportgenerator \
+            "-reports:TestResults/**/coverage.cobertura.xml" \
+            "-targetdir:coverage/dotnet" \
+            "-reporttypes:MarkdownSummaryGithub;Cobertura"
+          cat coverage/dotnet/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test results and coverage
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dotnet-test-results
+          path: |
+            TestResults/
+            coverage/dotnet/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  frontend:
+    name: Frontend build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: src/Web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Until the frontend scaffolding (#21) lands there is nothing to check.
+      # Skip the steps and keep the check green.
+      - name: Detect frontend
+        id: detect
+        working-directory: .
+        run: |
+          if [ -f src/Web/package.json ]; then
+            echo "has-frontend=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-frontend=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No src/Web/package.json found; skipping the frontend checks."
+          fi
+
+      - name: Set up Node.js
+        if: steps.detect.outputs.has-frontend == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: src/Web/package-lock.json
+
+      - name: Install dependencies
+        if: steps.detect.outputs.has-frontend == 'true'
+        run: npm ci
+
+      - name: Type-check
+        if: steps.detect.outputs.has-frontend == 'true'
+        run: npx tsc --noEmit
+
+      - name: Lint
+        if: steps.detect.outputs.has-frontend == 'true'
+        run: npx eslint . --max-warnings 0
+
+      - name: Check formatting
+        if: steps.detect.outputs.has-frontend == 'true'
+        run: npx prettier --check .
+
+      - name: Test
+        if: steps.detect.outputs.has-frontend == 'true'
+        run: >-
+          npx vitest run
+          --coverage.enabled
+          --coverage.reportsDirectory=coverage
+          --coverage.reporter=text
+          --coverage.reporter=json-summary
+          --coverage.reporter=cobertura
+
+      # Coverage is informational: it is reported, never gated (ADR-0003).
+      - name: Summarise coverage
+        if: ${{ !cancelled() && steps.detect.outputs.has-frontend == 'true' }}
+        run: |
+          if [ ! -f coverage/coverage-summary.json ]; then
+            echo "::notice::No frontend coverage summary found; skipping the coverage summary."
+            exit 0
+          fi
+          {
+            echo "## Frontend coverage"
+            echo
+            echo "| Metric | Covered | Total | % |"
+            echo "| --- | ---: | ---: | ---: |"
+            jq -r '.total | to_entries[] | select(.value | type == "object" and has("pct"))
+              | "| \(.key) | \(.value.covered) | \(.value.total) | \(.value.pct) |"' coverage/coverage-summary.json
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build
+        if: steps.detect.outputs.has-frontend == 'true'
+        run: npm run build
+
+      - name: Upload coverage
+        if: ${{ !cancelled() && steps.detect.outputs.has-frontend == 'true' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: frontend-coverage
+          path: src/Web/coverage/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # Blocks pull requests that add dependencies with known vulnerabilities
+      # (any severity) or with strong copyleft licences, which are incompatible
+      # with distributing the MIT-licensed application image.
+      - name: Review dependency changes
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: low
+          deny-licenses: >-
+            GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later,
+            AGPL-3.0-only, AGPL-3.0-or-later
