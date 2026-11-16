@@ -1,0 +1,23 @@
+# Normalise line endings to LF in the repository and working tree, matching .editorconfig.
+# Patterns use fnmatch rules, which do not support {a,b} brace expansion: use one pattern per line.
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pfx binary
+*.snk binary
+*.zip binary
