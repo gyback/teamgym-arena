@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../../Common/TeamGym.Arena.Common.csproj" />
+    <ProjectReference Include="../TeamGym.Arena.Modules.Organisations.Contracts/TeamGym.Arena.Modules.Organisations.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="TeamGym.Arena.Modules.Organisations.UnitTests" />
+  </ItemGroup>
+
+</Project>

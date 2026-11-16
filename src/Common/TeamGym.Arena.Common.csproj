@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Shared kernel (ADR-0004). Keep it small and free of business workflows: TeamGym primitives,
+    strongly typed ID support, Result and Error, and handler and event abstractions only.
+  -->
+
+</Project>

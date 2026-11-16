@@ -1,0 +1,14 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.6.5">
+
+  <!-- Local orchestration only (ADR-0004). Start it with `dotnet run` on this project. -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Api/TeamGym.Arena.Api.csproj" />
+  </ItemGroup>
+
+</Project>

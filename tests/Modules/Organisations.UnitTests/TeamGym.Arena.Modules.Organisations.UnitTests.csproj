@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="../../../src/Modules/Organisations/TeamGym.Arena.Modules.Organisations/TeamGym.Arena.Modules.Organisations.csproj" />
+  </ItemGroup>
+
+</Project>

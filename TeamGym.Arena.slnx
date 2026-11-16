@@ -1,2 +1,31 @@
 <Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Api/TeamGym.Arena.Api.csproj" />
+    <Project Path="src/AppHost/TeamGym.Arena.AppHost.csproj" />
+    <Project Path="src/Common/TeamGym.Arena.Common.csproj" />
+    <Project Path="src/ServiceDefaults/TeamGym.Arena.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/">
+    <Project Path="src/Modules/Applications/TeamGym.Arena.Modules.Applications/TeamGym.Arena.Modules.Applications.csproj" />
+    <Project Path="src/Modules/Applications/TeamGym.Arena.Modules.Applications.Contracts/TeamGym.Arena.Modules.Applications.Contracts.csproj" />
+    <Project Path="src/Modules/Competitions/TeamGym.Arena.Modules.Competitions/TeamGym.Arena.Modules.Competitions.csproj" />
+    <Project Path="src/Modules/Competitions/TeamGym.Arena.Modules.Competitions.Contracts/TeamGym.Arena.Modules.Competitions.Contracts.csproj" />
+    <Project Path="src/Modules/Organisations/TeamGym.Arena.Modules.Organisations/TeamGym.Arena.Modules.Organisations.csproj" />
+    <Project Path="src/Modules/Organisations/TeamGym.Arena.Modules.Organisations.Contracts/TeamGym.Arena.Modules.Organisations.Contracts.csproj" />
+    <Project Path="src/Modules/Scheduling/TeamGym.Arena.Modules.Scheduling/TeamGym.Arena.Modules.Scheduling.csproj" />
+    <Project Path="src/Modules/Scheduling/TeamGym.Arena.Modules.Scheduling.Contracts/TeamGym.Arena.Modules.Scheduling.Contracts.csproj" />
+    <Project Path="src/Modules/Users/TeamGym.Arena.Modules.Users/TeamGym.Arena.Modules.Users.csproj" />
+    <Project Path="src/Modules/Users/TeamGym.Arena.Modules.Users.Contracts/TeamGym.Arena.Modules.Users.Contracts.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Api.IntegrationTests/TeamGym.Arena.Api.IntegrationTests.csproj" />
+    <Project Path="tests/Common.UnitTests/TeamGym.Arena.Common.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Modules/">
+    <Project Path="tests/Modules/Applications.UnitTests/TeamGym.Arena.Modules.Applications.UnitTests.csproj" />
+    <Project Path="tests/Modules/Competitions.UnitTests/TeamGym.Arena.Modules.Competitions.UnitTests.csproj" />
+    <Project Path="tests/Modules/Organisations.UnitTests/TeamGym.Arena.Modules.Organisations.UnitTests.csproj" />
+    <Project Path="tests/Modules/Scheduling.UnitTests/TeamGym.Arena.Modules.Scheduling.UnitTests.csproj" />
+    <Project Path="tests/Modules/Users.UnitTests/TeamGym.Arena.Modules.Users.UnitTests.csproj" />
+  </Folder>
 </Solution>
