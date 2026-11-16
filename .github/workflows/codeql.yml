@@ -1,0 +1,76 @@
+# CodeQL static application security testing (ADR-0003, supply chain and security gates).
+# Runs on every pull request to main, on every push to main (the baseline that
+# pull request results are compared against) and weekly on main.
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "27 4 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  analyze:
+    # The job names are required status checks in the main branch ruleset.
+    # Renaming them breaks the ruleset until it is updated to match.
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # build-mode none analyses the source without compiling it, so the
+          # workflow does not depend on the .NET SDK or a successful build.
+          - language: csharp
+            build-mode: none
+            source-globs: "*.cs *.cshtml *.razor"
+          - language: javascript-typescript
+            build-mode: none
+            source-globs: "*.js *.jsx *.mjs *.cjs *.ts *.tsx *.mts *.cts"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # CodeQL fails when a language has no source files. Until the backend and
+      # frontend scaffolding lands, skip the analysis and keep the check green.
+      - name: Detect source files
+        id: detect
+        env:
+          SOURCE_GLOBS: ${{ matrix.source-globs }}
+        run: |
+          read -r -a globs <<< "$SOURCE_GLOBS"
+          if [ -n "$(git ls-files -- "${globs[@]}")" ]; then
+            echo "has-source=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has-source=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No ${{ matrix.language }} source files found; skipping CodeQL analysis."
+          fi
+
+      - name: Initialise CodeQL
+        if: steps.detect.outputs.has-source == 'true'
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          queries: security-extended
+
+      - name: Analyse
+        if: steps.detect.outputs.has-source == 'true'
+        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: /language:${{ matrix.language }}
