@@ -1,0 +1,41 @@
+# Pull request title check (ADR-0003, branching and commit convention).
+# Pull requests are squash-merged, so the title becomes the commit on main and
+# must follow Conventional Commits. The allowed types are those listed in
+# CONTRIBUTING.md. This lives outside ci.yml so that editing a title re-runs
+# only this check.
+name: PR title
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  conventional-commits:
+    # The job name is a required status check in the main branch ruleset.
+    # Renaming it breaks the ruleset until it is updated to match.
+    name: Conventional Commits PR title
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate title
+        env:
+          # Passed through the environment, never interpolated into the script.
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|docs|refactor|test|build|ci|chore)(\([A-Za-z0-9._/-]+\))?!?: [^ ].*$'
+          if [[ "$PR_TITLE" =~ $pattern ]]; then
+            echo "PR title follows Conventional Commits."
+          else
+            echo "::error title=Invalid PR title::'$PR_TITLE' does not follow Conventional Commits."
+            echo "Expected '<type>(<optional scope>): <description>', where <type> is one of"
+            echo "feat, fix, docs, refactor, test, build, ci or chore. See CONTRIBUTING.md."
+            exit 1
+          fi
