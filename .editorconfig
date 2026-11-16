@@ -8,6 +8,10 @@ trim_trailing_whitespace = true
 indent_style = space
 indent_size = 4
 
+# Windows-only scripts keep CRLF, matching .gitattributes.
+[*.{cmd,bat,ps1}]
+end_of_line = crlf
+
 [*.{props,targets,csproj,slnx,xml,config,resx}]
 indent_size = 2
 
