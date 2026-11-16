@@ -30,7 +30,14 @@ public class Result
         return new Result(error);
     }
 
-    public static Result<TValue> Success<TValue>(TValue value) => new(value);
+    /// <summary>Creates a successful result that carries <paramref name="value"/>.</summary>
+    /// <exception cref="ArgumentNullException"><paramref name="value"/> is <see langword="null"/>.</exception>
+    public static Result<TValue> Success<TValue>(TValue value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+
+        return new Result<TValue>(value);
+    }
 
     public static Result<TValue> Failure<TValue>(Error error)
     {

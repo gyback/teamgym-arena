@@ -55,6 +55,13 @@ public sealed class ResultTests
     }
 
     [Fact]
+    public void SuccessWithValueRequiresAValue()
+    {
+        Assert.Throws<ArgumentNullException>(() => Result.Success<string>(null!));
+        Assert.Throws<ArgumentNullException>(() => Result.Success<int?>(null));
+    }
+
+    [Fact]
     public void FailureRequiresAnError()
     {
         Assert.Throws<ArgumentNullException>(() => Result.Failure(null!));
