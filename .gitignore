@@ -1,0 +1,62 @@
+# .NET build outputs and caches
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Aa]rtifacts/
+out/
+*.nupkg
+*.snupkg
+project.lock.json
+project.fragment.lock.json
+efbundle
+efbundle.exe
+
+# .NET test and coverage results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+coverage/
+*.coverage
+*.coveragexml
+
+# User-specific and IDE files (Visual Studio, Rider, VS Code)
+.vs/
+.idea/
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Node.js, TypeScript and Vite (src/Web)
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+.vite/
+.eslintcache
+npm-debug.log*
+
+# Playwright E2E test outputs (tests/E2E)
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Local environment overrides, certificates and secrets
+.env
+.env.*
+!.env.example
+appsettings.*.local.json
+*.pfx
+*.pem
+*.key
+
+# OS-generated files
+.DS_Store
+Thumbs.db

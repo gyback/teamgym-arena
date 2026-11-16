@@ -1,0 +1,9 @@
+# Normalise line endings to LF in the repository and working tree, matching .editorconfig.
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF.
+*.{cmd,bat} text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary files
+*.{png,jpg,jpeg,gif,ico,webp,woff,woff2,ttf,eot,pfx,snk,zip} binary
