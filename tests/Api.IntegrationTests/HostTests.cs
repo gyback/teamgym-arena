@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 
@@ -18,6 +19,20 @@ public sealed class HostTests(WebApplicationFactory<Program> factory) : IClassFi
     public async Task HealthEndpointReportsHealthy(string path)
     {
         var response = await _client.GetAsync(new Uri(path, UriKind.Relative), CancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("Healthy", await response.Content.ReadAsStringAsync(CancellationToken));
+    }
+
+    [Theory]
+    [InlineData("/alive")]
+    [InlineData("/health")]
+    public async Task HealthEndpointIsMappedOutsideDevelopment(string path)
+    {
+        using var productionFactory = factory.WithWebHostBuilder(host => host.UseEnvironment("Production"));
+        using var client = productionFactory.CreateClient();
+
+        using var response = await client.GetAsync(new Uri(path, UriKind.Relative), CancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("Healthy", await response.Content.ReadAsStringAsync(CancellationToken));

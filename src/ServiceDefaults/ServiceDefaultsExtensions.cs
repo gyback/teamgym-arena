@@ -91,21 +91,18 @@ public static class ServiceDefaultsExtensions
 
     /// <summary>
     /// Maps <c>/health</c> (readiness: every check) and <c>/alive</c> (liveness: checks tagged <c>live</c>).
-    /// They are mapped in Development only until the container deployment contract (#37) lands.
+    /// They are mapped in every environment, because the platform probes depend on them (ADR-0009).
     /// </summary>
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
         ArgumentNullException.ThrowIfNull(app);
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.MapHealthChecks(HealthEndpointPath);
+        app.MapHealthChecks(HealthEndpointPath);
 
-            app.MapHealthChecks(AlivenessEndpointPath, new HealthCheckOptions
-            {
-                Predicate = registration => registration.Tags.Contains(LiveTag),
-            });
-        }
+        app.MapHealthChecks(AlivenessEndpointPath, new HealthCheckOptions
+        {
+            Predicate = registration => registration.Tags.Contains(LiveTag),
+        });
 
         return app;
     }
