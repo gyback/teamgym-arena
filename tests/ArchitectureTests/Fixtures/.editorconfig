@@ -1,0 +1,4 @@
+[*.cs]
+# The fixtures are fake module types. Some are public on purpose, because OnlyRegistrationIsPublic must see a
+# public registration class it accepts and a public type it reports. CA1515 would make them internal.
+dotnet_diagnostic.CA1515.severity = none

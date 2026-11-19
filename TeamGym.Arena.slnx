@@ -18,6 +18,7 @@
     <Project Path="src/Modules/Users/TeamGym.Arena.Modules.Users.Contracts/TeamGym.Arena.Modules.Users.Contracts.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/ArchitectureTests/TeamGym.Arena.ArchitectureTests.csproj" />
     <Project Path="tests/Api.IntegrationTests/TeamGym.Arena.Api.IntegrationTests.csproj" />
     <Project Path="tests/Common.UnitTests/TeamGym.Arena.Common.UnitTests.csproj" />
   </Folder>
