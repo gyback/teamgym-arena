@@ -1,0 +1,4 @@
+[*.cs]
+# xUnit runs tests on its own synchronisation context, and xUnit1030 forbids ConfigureAwait(false) in test
+# methods. CA2007 demands the opposite, so it is turned off for test code only.
+dotnet_diagnostic.CA2007.severity = none

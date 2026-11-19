@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Public DTOs, integration events and query interfaces that other modules may use (ADR-0004). -->
+
+  <ItemGroup>
+    <ProjectReference Include="../../../Common/TeamGym.Arena.Common.csproj" />
+  </ItemGroup>
+
+</Project>

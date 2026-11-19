@@ -33,6 +33,13 @@ The development environment is defined by
 - A container runtime such as [Docker Desktop](https://www.docker.com/products/docker-desktop/) or
   [Podman](https://podman.io/) (for .NET Aspire and Testcontainers)
 
+Trust the ASP.NET Core development certificate once per machine. On Windows and macOS this opens a
+confirmation prompt, which `dotnet run --project src/AppHost` otherwise waits on:
+
+```shell
+dotnet dev-certs https --trust
+```
+
 Then run the whole application, including PostgreSQL, Keycloak and Mailpit, with:
 
 ```shell
@@ -42,8 +49,8 @@ dotnet run --project src/AppHost
 No cloud account is needed. Local sign-in uses seeded test users in Keycloak
 ([ADR-0008](docs/adr/0008-identity-authentication-and-authorisation.md)).
 
-These instructions become usable once the scaffolding issues (#11, #18, #21) are merged, and those pull
-requests update this section.
+Today the AppHost starts the API and the Aspire dashboard. PostgreSQL (#27), Keycloak (#32), Mailpit
+(#38) and the web app (#21) are added by those issues, and their pull requests update this section.
 
 ## Workflow
 

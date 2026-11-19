@@ -10,9 +10,10 @@ TeamGym Arena is an open-source administration tool for
 [`README.md`](README.md) for goals and scope, and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full
 contribution workflow.
 
-> **Project status: pre-alpha, decision phase.** No application code exists yet. The layout and commands
-> below are those decided in the ADRs. They take effect as the scaffolding issues (#11, #18, #21) land, and
-> each scaffolding PR updates this file with the real commands.
+> **Project status: pre-alpha.** The backend host, Aspire AppHost, shared kernel and empty MVP module projects
+> exist (#18); there are no domain features yet. The rest of the layout and commands below are those decided in
+> the ADRs. They take effect as the remaining scaffolding issues (#19, #21, #27) land, and each of those PRs
+> updates this file with the real commands.
 
 ## Guardrails
 
@@ -78,6 +79,7 @@ src/
 tests/
   ArchitectureTests/           ArchUnitNET boundary rules
   Api.IntegrationTests/        HTTP + Testcontainers PostgreSQL
+  Common.UnitTests/            Shared kernel unit tests
   Modules/<Module>.UnitTests/  Domain and handler unit tests
   E2E/                         Playwright critical journeys
 ```
@@ -140,6 +142,7 @@ checks ([ADR-0003](docs/adr/0003-engineering-workflow-and-quality-gates.md)).
 
 | Purpose | Command |
 | --- | --- |
+| Trust the HTTPS development certificate (once per machine) | `dotnet dev-certs https --trust` |
 | Run the whole app locally (PostgreSQL, Keycloak, Mailpit, API, Web) | `dotnet run --project src/AppHost` |
 | Build the backend (warnings are errors) | `dotnet build` |
 | Check .NET formatting | `dotnet format --verify-no-changes` |
