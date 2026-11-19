@@ -9,6 +9,11 @@
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.15" />
   </ItemGroup>
 
+  <!-- Aspire hosting integrations stay on the band of the Aspire.AppHost.Sdk in src/AppHost. -->
+  <ItemGroup Label="AppHost">
+    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.6.5" />
+  </ItemGroup>
+
   <ItemGroup Label="Service defaults">
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.11.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.11.0" />

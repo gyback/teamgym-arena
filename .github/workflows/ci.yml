@@ -99,21 +99,7 @@ jobs:
         with:
           persist-credentials: false
 
-      # Until the frontend scaffolding (#21) lands there is nothing to check.
-      # Skip the steps and keep the check green.
-      - name: Detect frontend
-        id: detect
-        working-directory: .
-        run: |
-          if [ -f src/Web/package.json ]; then
-            echo "has-frontend=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has-frontend=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::No src/Web/package.json found; skipping the frontend checks."
-          fi
-
       - name: Set up Node.js
-        if: steps.detect.outputs.has-frontend == 'true'
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: lts/*
@@ -121,26 +107,20 @@ jobs:
           cache-dependency-path: src/Web/package-lock.json
 
       - name: Install dependencies
-        if: steps.detect.outputs.has-frontend == 'true'
         run: npm ci
 
       - name: Type-check
-        if: steps.detect.outputs.has-frontend == 'true'
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Lint
-        if: steps.detect.outputs.has-frontend == 'true'
-        run: npx eslint . --max-warnings 0
+        run: npm run lint
 
       - name: Check formatting
-        if: steps.detect.outputs.has-frontend == 'true'
-        run: npx prettier --check .
+        run: npm run format:check
 
       - name: Test
-        if: steps.detect.outputs.has-frontend == 'true'
         run: >-
-          npx vitest run
-          --coverage.enabled
+          npm run test:ci --
           --coverage.reportsDirectory=coverage
           --coverage.reporter=text
           --coverage.reporter=json-summary
@@ -148,7 +128,7 @@ jobs:
 
       # Coverage is informational: it is reported, never gated (ADR-0003).
       - name: Summarise coverage
-        if: ${{ !cancelled() && steps.detect.outputs.has-frontend == 'true' }}
+        if: ${{ !cancelled() }}
         run: |
           if [ ! -f coverage/coverage-summary.json ]; then
             echo "::notice::No frontend coverage summary found; skipping the coverage summary."
@@ -164,15 +144,68 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build
-        if: steps.detect.outputs.has-frontend == 'true'
         run: npm run build
 
       - name: Upload coverage
-        if: ${{ !cancelled() && steps.detect.outputs.has-frontend == 'true' }}
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: frontend-coverage
           path: src/Web/coverage/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # Playwright against the built SPA served by `vite preview` (tests/E2E/playwright.config.ts). Full-stack
+  # journeys against the API join this job once sign-in (#32) and persistence (#27) exist.
+  e2e:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: tests/E2E
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: |
+            src/Web/package-lock.json
+            tests/E2E/package-lock.json
+
+      - name: Install web app dependencies
+        working-directory: src/Web
+        run: npm ci
+
+      - name: Install E2E dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Test
+        run: npm test
+
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-report
+          path: |
+            tests/E2E/playwright-report/
+            tests/E2E/test-results/
           if-no-files-found: ignore
           retention-days: 14
 
