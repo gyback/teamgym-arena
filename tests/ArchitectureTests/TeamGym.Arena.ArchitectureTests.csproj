@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- ArchUnitNET rules that enforce the module boundaries of ADR-0004, ADR-0007 and ADR-0009. -->
+
+  <ItemGroup>
+    <PackageReference Include="TngTech.ArchUnitNET.xUnitV3" />
+  </ItemGroup>
+
+  <!--
+    The Api host references every module, and every module references its own Contracts project, so this one
+    reference copies every src assembly next to the tests, where SolutionArchitecture discovers them.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="../../src/Api/TeamGym.Arena.Api.csproj" />
+  </ItemGroup>
+
+</Project>

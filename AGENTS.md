@@ -10,10 +10,10 @@ TeamGym Arena is an open-source administration tool for
 [`README.md`](README.md) for goals and scope, and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full
 contribution workflow.
 
-> **Project status: pre-alpha.** The backend host, Aspire AppHost, shared kernel and empty MVP module projects
-> exist (#18); there are no domain features yet. The rest of the layout and commands below are those decided in
-> the ADRs. They take effect as the remaining scaffolding issues (#19, #21, #27) land, and each of those PRs
-> updates this file with the real commands.
+> **Project status: pre-alpha.** The backend host, Aspire AppHost, shared kernel, empty MVP module projects (#18)
+> and the architecture tests (#19) exist; there are no domain features yet. The rest of the layout and commands
+> below are those decided in the ADRs. They take effect as the remaining scaffolding issues (#21, #27) land, and
+> each of those PRs updates this file with the real commands.
 
 ## Guardrails
 
@@ -159,7 +159,9 @@ The scaffolding PRs replace the frontend row with the exact `npm run` script nam
 - **Unit tests** for every domain rule and handler. Domain tests use no mocks and no database.
 - **Integration tests** for every endpoint, persistence change, migration and authorisation rule, against
   real PostgreSQL through Testcontainers. Include the cross-organisation access cases.
-- **Architecture tests** must keep passing. Do not change a rule to make your code pass it.
+- **Architecture tests** must keep passing. Do not change a rule to make your code pass it. The rules live in
+  `tests/ArchitectureTests/ModuleRules.cs`. A new rule needs a planted violation in
+  `tests/ArchitectureTests/Fixtures/` and a test in `RuleFixtureTests` that proves the rule reports it.
 - **E2E tests** (Playwright) for the critical journeys only.
 - There is no coverage percentage gate. Cover behaviour and edge cases, not lines.
 
