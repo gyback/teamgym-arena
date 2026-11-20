@@ -103,7 +103,7 @@ The architecture tests enforce most of these. Breaking one is an ADR question, n
 - Inside a module, use `Domain/` (pure C#, no EF Core, HTTP or Azure references), `Features/<UseCase>/`
   (one vertical slice per command or query) and `Persistence/`. Types are `internal` by default.
 - Minimal APIs with `TypedResults` and RFC 9457 `ProblemDetails`. Plain handler classes; no MediatR or other
-  mediator library.
+  mediator library. Name every endpoint with `WithName()`, which becomes its OpenAPI operation ID.
 - Query handlers use `.AsNoTracking()` projections. No generic repositories.
 - IDs are strongly typed `readonly record struct`s backed by UUIDv7. Timestamps are UTC `DateTimeOffset`
   from `TimeProvider`.
@@ -128,8 +128,9 @@ The architecture tests enforce most of these. Breaking one is an ADR question, n
 **Frontend** ([ADR-0005](docs/adr/0005-frontend-framework-and-api-contract.md)):
 
 - TypeScript strict mode. Feature folders under `src/Web/src/features/` mirror the backend modules.
-- Call the API only through the generated `openapi-fetch` client. Regenerate `schema.d.ts` whenever the API
-  contract changes and commit it; never edit it by hand.
+- Call the API only through the `openapi-fetch` client in `src/Web/src/shared/api/client.ts`. Whenever the API
+  contract changes, run `dotnet build` and `npm run generate:api`, and commit both `src/Api/openapi.json` and
+  `schema.d.ts`; never edit either by hand. CI fails on contract drift.
 - No hard-coded user-facing strings. Use `i18next` keys and provide both `en` and `sv` translations.
 - Use the `shadcn/ui` primitives in `src/Web/src/shared/components/ui/` and keep them accessible
   (WCAG 2.2 AA).
@@ -148,6 +149,7 @@ checks ([ADR-0003](docs/adr/0003-engineering-workflow-and-quality-gates.md)).
 | Check .NET formatting | `dotnet format --verify-no-changes` |
 | Run backend tests (needs Docker for Testcontainers) | `dotnet test` |
 | Install frontend dependencies | `npm ci` (in `src/Web`) |
+| Regenerate the API types after `dotnet build` exported `src/Api/openapi.json` | `npm run generate:api` (in `src/Web`) |
 | Type-check the frontend (strict) | `npm run typecheck` (in `src/Web`) |
 | Lint the frontend (zero warnings) | `npm run lint` (in `src/Web`) |
 | Check frontend formatting | `npm run format:check` (in `src/Web`; `npm run format` fixes it) |

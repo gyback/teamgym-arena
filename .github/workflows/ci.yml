@@ -52,6 +52,29 @@ jobs:
       - name: Check formatting
         run: dotnet format --verify-no-changes --no-restore
 
+      # API contract drift gate (ADR-0005). The build exported src/Api/openapi.json; regenerate the SPA's
+      # types from it and fail when either file differs from the committed one.
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: src/Web/package-lock.json
+
+      - name: Install web app dependencies
+        working-directory: src/Web
+        run: npm ci
+
+      - name: Check the API contract is up to date
+        run: |
+          npm run --prefix src/Web generate:api
+          contract=(src/Api/openapi.json src/Web/src/shared/api/schema.d.ts)
+          if [ -n "$(git status --porcelain -- "${contract[@]}")" ]; then
+            git --no-pager diff -- "${contract[@]}"
+            echo "::error::The API contract changed. Run 'dotnet build', then 'npm run generate:api' in src/Web, and commit src/Api/openapi.json and src/Web/src/shared/api/schema.d.ts."
+            exit 1
+          fi
+
       # Unit, integration (Testcontainers on the runner's Docker engine) and
       # architecture tests are all part of the solution.
       - name: Test

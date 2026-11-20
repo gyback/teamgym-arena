@@ -2,8 +2,31 @@
 
   <!-- The single ASP.NET Core host that composes every module (ADR-0004). -->
 
+  <!--
+    Every build exports the OpenAPI 3.1 contract to openapi.json (ADR-0005), from which `npm run generate:api` in
+    src/Web generates the SPA's types. Commit both files: CI fails when either differs from what the build produces.
+  -->
+  <PropertyGroup>
+    <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)</OpenApiDocumentsDirectory>
+    <OpenApiGenerateDocumentsOptions>--file-name openapi</OpenApiGenerateDocumentsOptions>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The exported contract is a build output for the SPA, not a file the host serves or publishes. -->
+    <Content Remove="openapi.json" />
+    <None Include="openapi.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="TeamGym.Arena.Api.IntegrationTests" />
   </ItemGroup>
 
   <ItemGroup>
