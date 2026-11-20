@@ -103,7 +103,8 @@ The architecture tests enforce most of these. Breaking one is an ADR question, n
 - Inside a module, use `Domain/` (pure C#, no EF Core, HTTP or Azure references), `Features/<UseCase>/`
   (one vertical slice per command or query) and `Persistence/`. Types are `internal` by default.
 - Minimal APIs with `TypedResults` and RFC 9457 `ProblemDetails`. Plain handler classes; no MediatR or other
-  mediator library. Name every endpoint with `WithName()`, which becomes its OpenAPI operation ID.
+  mediator library. Name every endpoint with `WithName()`, which becomes its OpenAPI operation ID, and tag it
+  with its module through `WithTags("<Module>")` on the module's route group.
 - Query handlers use `.AsNoTracking()` projections. No generic repositories.
 - IDs are strongly typed `readonly record struct`s backed by UUIDv7. Timestamps are UTC `DateTimeOffset`
   from `TimeProvider`.

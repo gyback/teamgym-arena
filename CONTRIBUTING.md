@@ -140,7 +140,8 @@ npm test
 (in `src/Web`) generates the SPA's types in `src/Web/src/shared/api/schema.d.ts` from it
 ([ADR-0005](docs/adr/0005-frontend-framework-and-api-contract.md)). When you change an endpoint, run both and
 commit both files. CI fails when either differs from what the build generates. Name every endpoint with
-`WithName()` (its operation ID) and map it on its module's route group (its tag).
+`WithName()` (its operation ID) and map it on its module's route group, which calls `WithTags("<Module>")` (its
+tag).
 
 ### Tests
 

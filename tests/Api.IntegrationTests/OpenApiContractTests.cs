@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -53,10 +55,10 @@ public sealed class OpenApiContractTests(WebApplicationFactory<Program> factory)
             "The build-time export has no server address, so the served document must not have one either.");
     }
 
-    // Generated client methods and TanStack Query keys are named after operation IDs, and the SPA groups
-    // operations by module tag. Name every endpoint with WithName(), and map it on its module's route group.
+    // Generated client methods and TanStack Query keys are named after operation IDs. Name every endpoint with
+    // WithName().
     [Fact]
-    public async Task EveryOperationHasAUniqueOperationIdAndATag()
+    public async Task EveryOperationHasAUniqueOperationId()
     {
         using var client = factory.CreateClient();
         using var document = await GetDocumentAsync(client);
@@ -64,17 +66,34 @@ public sealed class OpenApiContractTests(WebApplicationFactory<Program> factory)
         var operations = Operations(document).ToList();
 
         Assert.All(operations, operation =>
-        {
             Assert.True(
                 operation.Value.TryGetProperty("operationId", out var operationId)
                     && !string.IsNullOrWhiteSpace(operationId.GetString()),
-                $"{operation.Key} has no operation ID.");
-            Assert.True(
-                operation.Value.TryGetProperty("tags", out var tags) && tags.GetArrayLength() > 0,
-                $"{operation.Key} has no tag.");
-        });
+                $"{operation.Key} has no operation ID."));
         var operationIds = operations.Select(operation => operation.Value.GetProperty("operationId").GetString());
         Assert.Distinct(operationIds);
+    }
+
+    // The SPA groups operations by module tag. The document tags an untagged operation with its handler's type
+    // or the application name, so the rule checks that every described endpoint declares its tags itself:
+    // call WithTags("<Module>") on the module's route group.
+    [Fact]
+    public void EveryOperationDeclaresItsTags()
+    {
+        Assert.Empty(OperationsWithoutDeclaredTags(factory.Services));
+    }
+
+    [Fact]
+    public async Task OperationWithoutDeclaredTagsBreaksTheTagRule()
+    {
+        await using var app = await StartAppAsync(endpoints =>
+        {
+            endpoints.MapGroup("/api/v1/untagged").MapGet("/probe", () => TypedResults.NoContent()).WithName("Untagged");
+            endpoints.MapGroup("/api/v1/tagged").WithTags("Competitions")
+                .MapGet("/probe", () => TypedResults.NoContent()).WithName("Tagged");
+        });
+
+        Assert.Equal(["GET api/v1/untagged/probe"], OperationsWithoutDeclaredTags(app.Services));
     }
 
     [Fact]
@@ -196,6 +215,13 @@ public sealed class OpenApiContractTests(WebApplicationFactory<Program> factory)
     private static IEnumerable<KeyValuePair<string, JsonElement>> Operations(JsonDocument document) =>
         document.RootElement.GetProperty("paths").EnumerateObject().SelectMany(path => path.Value.EnumerateObject()
             .Select(operation => KeyValuePair.Create($"{operation.Name.ToUpperInvariant()} {path.Name}", operation.Value)));
+
+    private static List<string> OperationsWithoutDeclaredTags(IServiceProvider services) =>
+        services.GetRequiredService<IApiDescriptionGroupCollectionProvider>().ApiDescriptionGroups.Items
+            .SelectMany(group => group.Items)
+            .Where(description => !description.ActionDescriptor.EndpointMetadata.OfType<ITagsMetadata>().Any())
+            .Select(description => $"{description.HttpMethod} {description.RelativePath}")
+            .ToList();
 
     private static JsonElement Responses(JsonDocument document, string path, string method = "get") =>
         document.RootElement.GetProperty("paths").GetProperty(path).GetProperty(method).GetProperty("responses");
