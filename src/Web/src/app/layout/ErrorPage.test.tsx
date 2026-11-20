@@ -3,24 +3,27 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
-  Outlet,
   RouterProvider,
 } from '@tanstack/react-router';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { ErrorPage } from './ErrorPage';
+import { routerDefaults } from '@/app/router';
 
+import { RootLayout } from './RootLayout';
+
+// The page route has no errorComponent of its own, as in the app: its errors reach ErrorPage through the
+// router's defaultErrorComponent.
 function renderFailingRoute(loader: () => string) {
-  const rootRoute = createRootRoute({ component: Outlet });
+  const rootRoute = createRootRoute({ component: RootLayout });
   const pageRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/',
     loader,
     component: () => <p>{pageRoute.useLoaderData()}</p>,
-    errorComponent: ErrorPage,
   });
   const router = createRouter({
+    ...routerDefaults,
     routeTree: rootRoute.addChildren([pageRoute]),
     history: createMemoryHistory({ initialEntries: ['/'] }),
   });
@@ -37,6 +40,17 @@ describe('ErrorPage', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong');
     expect(screen.queryByText(/secret/)).not.toBeInTheDocument();
+  });
+
+  it('keeps the app layout around a failing page', async () => {
+    await renderFailingRoute(() => {
+      throw new Error('Temporary failure');
+    });
+
+    expect(within(screen.getByRole('main')).getByRole('alert')).toBeInTheDocument();
+    expect(screen.getByRole('banner')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Skip to main content' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Language' })).toBeInTheDocument();
   });
 
   it('loads the route again when the user retries', async () => {
