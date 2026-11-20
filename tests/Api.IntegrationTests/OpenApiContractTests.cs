@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -90,6 +91,46 @@ public sealed class OpenApiContractTests(WebApplicationFactory<Program> factory)
     }
 
     [Fact]
+    public async Task OperationThatTheFallbackPolicyProtectsDescribesUnauthorizedAsProblemDetails()
+    {
+        await using var app = await StartAppAsync(
+            endpoints => endpoints.MapGet("/api/v1/probe", () => TypedResults.NoContent()).WithName("Probe"),
+            requireUserByDefault: true);
+        using var document = await GetDocumentAsync(app.GetTestClient());
+
+        var responses = Responses(document, "/api/v1/probe");
+
+        Assert.Equal(ProblemDetailsRef, ProblemSchemaRef(responses, "401"));
+    }
+
+    [Fact]
+    public async Task AnonymousOperationIsNotUnauthorizedEvenWithAFallbackPolicy()
+    {
+        await using var app = await StartAppAsync(
+            endpoints => endpoints.MapGet("/api/v1/probe", () => TypedResults.NoContent())
+                .WithName("Probe")
+                .AllowAnonymous(),
+            requireUserByDefault: true);
+        using var document = await GetDocumentAsync(app.GetTestClient());
+
+        var responses = Responses(document, "/api/v1/probe");
+
+        Assert.False(responses.TryGetProperty("401", out _));
+    }
+
+    [Fact]
+    public async Task OperationWithoutAuthorisationOrAFallbackPolicyIsNotUnauthorized()
+    {
+        await using var app = await StartAppAsync(endpoints =>
+            endpoints.MapGet("/api/v1/probe", () => TypedResults.NoContent()).WithName("Probe"));
+        using var document = await GetDocumentAsync(app.GetTestClient());
+
+        var responses = Responses(document, "/api/v1/probe");
+
+        Assert.False(responses.TryGetProperty("401", out _));
+    }
+
+    [Fact]
     public async Task AnonymousOperationDescribesServerErrorsButNotUnauthorized()
     {
         await using var app = await StartAppAsync(endpoints =>
@@ -122,15 +163,23 @@ public sealed class OpenApiContractTests(WebApplicationFactory<Program> factory)
         Assert.False(responses.GetProperty("401").TryGetProperty("content", out _));
     }
 
-    private static async Task<WebApplication> StartAppAsync(Action<WebApplication> mapEndpoints)
+    private static async Task<WebApplication> StartAppAsync(
+        Action<WebApplication> mapEndpoints,
+        bool requireUserByDefault = false)
     {
         var builder = WebApplication.CreateBuilder();
         builder.WebHost.UseTestServer();
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthorization(options =>
+        {
+            if (requireUserByDefault)
+            {
+                options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+            }
+        });
         builder.Services.AddApiOpenApi();
 
         var app = builder.Build();
-        app.MapOpenApi();
+        app.MapOpenApi().AllowAnonymous();
         mapEndpoints(app);
 
         await app.StartAsync(CancellationToken);

@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 
 namespace TeamGym.Arena.Api.OpenApi;
@@ -83,12 +84,9 @@ internal static class OpenApiConventions
         OpenApiOperationTransformerContext context,
         CancellationToken cancellationToken)
     {
-        var metadata = context.Description.ActionDescriptor.EndpointMetadata;
-        var requiresUser = metadata.OfType<IAuthorizeData>().Any() && !metadata.OfType<IAllowAnonymous>().Any();
-
         operation.Responses ??= [];
 
-        if (requiresUser)
+        if (RequiresUser(context))
         {
             AddProblemResponse(operation, context, StatusCodes.Status401Unauthorized, "Unauthorized");
         }
@@ -96,6 +94,26 @@ internal static class OpenApiConventions
         AddProblemResponse(operation, context, StatusCodes.Status500InternalServerError, "Internal Server Error");
 
         return Task.CompletedTask;
+    }
+
+    // ADR-0008 protects endpoints with a fallback policy, which adds no metadata to the endpoint, so an endpoint
+    // requires a user unless it allows anonymous access, and either declares its own authorisation or a fallback
+    // policy applies to it.
+    private static bool RequiresUser(OpenApiOperationTransformerContext context)
+    {
+        var metadata = context.Description.ActionDescriptor.EndpointMetadata;
+        if (metadata.OfType<IAllowAnonymous>().Any())
+        {
+            return false;
+        }
+
+        if (metadata.OfType<IAuthorizeData>().Any() || metadata.OfType<AuthorizationPolicy>().Any())
+        {
+            return true;
+        }
+
+        var authorizationOptions = context.ApplicationServices.GetService<IOptions<AuthorizationOptions>>();
+        return authorizationOptions?.Value.FallbackPolicy is not null;
     }
 
     private static void AddProblemResponse(
