@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.JavaScript" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="../Api/TeamGym.Arena.Api.csproj" />
   </ItemGroup>
 

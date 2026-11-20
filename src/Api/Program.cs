@@ -1,3 +1,4 @@
+using TeamGym.Arena.Api.Spa;
 using TeamGym.Arena.Modules.Applications;
 using TeamGym.Arena.Modules.Competitions;
 using TeamGym.Arena.Modules.Organisations;
@@ -31,6 +32,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseSpaStaticFiles();
+
 app.UseAuthorization();
 
 app.MapDefaultEndpoints();
@@ -40,5 +43,8 @@ app.MapOrganisationsEndpoints();
 app.MapCompetitionsEndpoints();
 app.MapApplicationsEndpoints();
 app.MapSchedulingEndpoints();
+
+// Last, so that every API, BFF and health endpoint takes precedence over the client-side routes.
+app.MapSpaFallback();
 
 app.Run();

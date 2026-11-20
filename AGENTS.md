@@ -10,10 +10,10 @@ TeamGym Arena is an open-source administration tool for
 [`README.md`](README.md) for goals and scope, and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full
 contribution workflow.
 
-> **Project status: pre-alpha.** The backend host, Aspire AppHost, shared kernel, empty MVP module projects (#18)
-> and the architecture tests (#19) exist; there are no domain features yet. The rest of the layout and commands
-> below are those decided in the ADRs. They take effect as the remaining scaffolding issues (#21, #27) land, and
-> each of those PRs updates this file with the real commands.
+> **Project status: pre-alpha.** The backend host, Aspire AppHost, shared kernel, empty MVP module projects (#18),
+> the architecture tests (#19) and the web app shell with its E2E harness (#21) exist; there are no domain
+> features yet. The rest of the layout and commands below are those decided in the ADRs. They take effect as the
+> remaining scaffolding issue (#27) lands, and that PR updates this file with the real commands.
 
 ## Guardrails
 
@@ -148,11 +148,12 @@ checks ([ADR-0003](docs/adr/0003-engineering-workflow-and-quality-gates.md)).
 | Check .NET formatting | `dotnet format --verify-no-changes` |
 | Run backend tests (needs Docker for Testcontainers) | `dotnet test` |
 | Install frontend dependencies | `npm ci` (in `src/Web`) |
-| Type-check, lint and format-check the frontend | `tsc --noEmit`, ESLint (zero warnings) and `prettier --check` (in `src/Web`) |
-| Run frontend unit and component tests | `npx vitest run --coverage` (in `src/Web`) |
+| Type-check the frontend (strict) | `npm run typecheck` (in `src/Web`) |
+| Lint the frontend (zero warnings) | `npm run lint` (in `src/Web`) |
+| Check frontend formatting | `npm run format:check` (in `src/Web`; `npm run format` fixes it) |
+| Run frontend unit and component tests | `npm run test:ci` (in `src/Web`; `npm test` watches) |
 | Build the frontend | `npm run build` (in `src/Web`) |
-
-The scaffolding PRs replace the frontend row with the exact `npm run` script names.
+| Run the E2E tests (Playwright) | `npm ci`, `npx playwright install chromium`, then `npm test` (in `tests/E2E`) |
 
 ## Testing
 

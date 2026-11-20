@@ -44,6 +44,7 @@ dist-ssr/
 npm-debug.log*
 
 # Playwright E2E test outputs (tests/E2E)
+test-results/
 playwright-report/
 blob-report/
 playwright/.cache/

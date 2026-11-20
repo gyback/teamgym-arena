@@ -25,9 +25,11 @@ updates:
         patterns: ["*"]
         update-types: [minor, patch]
 
-  # Frontend packages (ADR-0005). The SPA lands in src/Web.
+  # Frontend packages (ADR-0005): the SPA and the Playwright E2E tests.
   - package-ecosystem: npm
-    directory: /src/Web
+    directories:
+      - /src/Web
+      - /tests/E2E
     schedule:
       interval: weekly
       day: monday

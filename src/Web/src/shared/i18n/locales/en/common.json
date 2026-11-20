@@ -1,0 +1,29 @@
+{
+  "app": {
+    "name": "TeamGym Arena",
+    "tagline": "Competition administration for TeamGym"
+  },
+  "layout": {
+    "skipToContent": "Skip to main content",
+    "homeLink": "TeamGym Arena, home"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "sv": "Svenska"
+  },
+  "home": {
+    "title": "Welcome to TeamGym Arena",
+    "intro": "TeamGym Arena helps organisers, clubs and coaches run TeamGym competitions. Competitions, team applications and schedules are on their way."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has moved.",
+    "backHome": "Go to the home page"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "The page could not be shown. Try again, and if the problem continues, contact your competition organiser.",
+    "retry": "Try again"
+  }
+}

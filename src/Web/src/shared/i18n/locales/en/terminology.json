@@ -1,0 +1,13 @@
+{
+  "discipline": {
+    "Floor": "Floor",
+    "Tumble": "Tumble",
+    "Trampet": "Trampet"
+  },
+  "section": {
+    "Women": "Women",
+    "Men": "Men",
+    "Mixed": "Mixed",
+    "Open": "Open"
+  }
+}

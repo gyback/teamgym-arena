@@ -1,0 +1,29 @@
+{
+  "app": {
+    "name": "TeamGym Arena",
+    "tagline": "Tävlingsadministration för truppgymnastik"
+  },
+  "layout": {
+    "skipToContent": "Hoppa till huvudinnehållet",
+    "homeLink": "TeamGym Arena, startsida"
+  },
+  "language": {
+    "label": "Språk",
+    "en": "English",
+    "sv": "Svenska"
+  },
+  "home": {
+    "title": "Välkommen till TeamGym Arena",
+    "intro": "TeamGym Arena hjälper arrangörer, föreningar och tränare att genomföra tävlingar i truppgymnastik. Tävlingar, anmälningar av lag och tävlingsscheman är på väg."
+  },
+  "notFound": {
+    "title": "Sidan hittades inte",
+    "description": "Sidan du letar efter finns inte eller har flyttats.",
+    "backHome": "Gå till startsidan"
+  },
+  "error": {
+    "title": "Något gick fel",
+    "description": "Sidan kunde inte visas. Försök igen, och kontakta tävlingsarrangören om problemet kvarstår.",
+    "retry": "Försök igen"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "discipline": {
+    "Floor": "Fristående",
+    "Tumble": "Tumbling",
+    "Trampet": "Trampett"
+  },
+  "section": {
+    "Women": "Dam",
+    "Men": "Herr",
+    "Mixed": "Mixed",
+    "Open": "Öppen"
+  }
+}
