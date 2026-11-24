@@ -4,18 +4,14 @@ namespace TeamGym.Arena.Modules.Organisations.Domain.Organisations;
 
 internal static class OrganisationErrors
 {
-    public const int NameMaxLength = 200;
-
-    public const int ShortNameMaxLength = 20;
-
     public static readonly Error NameRequired = Error.Validation(
         "Organisations.NameRequired", "An organisation needs a name.");
 
     public static readonly Error NameTooLong = Error.Validation(
-        "Organisations.NameTooLong", $"An organisation name is at most {NameMaxLength} characters.");
+        "Organisations.NameTooLong", $"An organisation name is at most {Organisation.NameMaxLength} characters.");
 
     public static readonly Error ShortNameTooLong = Error.Validation(
-        "Organisations.ShortNameTooLong", $"An organisation short name is at most {ShortNameMaxLength} characters.");
+        "Organisations.ShortNameTooLong", $"An organisation short name is at most {Organisation.ShortNameMaxLength} characters.");
 
     public static readonly Error InvalidCountryCode = Error.Validation(
         "Organisations.InvalidCountryCode", "The country code must be an ISO 3166-1 alpha-2 code, such as SE.");

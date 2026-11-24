@@ -48,7 +48,7 @@ public sealed class OrganisationTests
     [Fact]
     public void CreateRejectsATooLongName()
     {
-        var name = new string('a', OrganisationErrors.NameMaxLength + 1);
+        var name = new string('a', Organisation.NameMaxLength + 1);
 
         var result = Organisation.Create(name, null, OrganisationType.Club, "SE", parent: null, _clock);
 
@@ -58,7 +58,7 @@ public sealed class OrganisationTests
     [Fact]
     public void CreateRejectsATooLongShortName()
     {
-        var shortName = new string('a', OrganisationErrors.ShortNameMaxLength + 1);
+        var shortName = new string('a', Organisation.ShortNameMaxLength + 1);
 
         var result = Organisation.Create("GF Test", shortName, OrganisationType.Club, "SE", parent: null, _clock);
 

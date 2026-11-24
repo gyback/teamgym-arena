@@ -14,6 +14,10 @@ namespace TeamGym.Arena.Modules.Organisations.Domain.Organisations;
 /// </summary>
 internal sealed class Organisation
 {
+    public const int NameMaxLength = 200;
+
+    public const int ShortNameMaxLength = 20;
+
     private readonly List<OrganisationMembership> _memberships = [];
 
     private Organisation(
@@ -303,13 +307,13 @@ internal sealed class Organisation
             return Result.Failure<(string, string?)>(OrganisationErrors.NameRequired);
         }
 
-        if (trimmedName.Length > OrganisationErrors.NameMaxLength)
+        if (trimmedName.Length > NameMaxLength)
         {
             return Result.Failure<(string, string?)>(OrganisationErrors.NameTooLong);
         }
 
         var trimmedShortName = string.IsNullOrWhiteSpace(shortName) ? null : shortName.Trim();
-        if (trimmedShortName?.Length > OrganisationErrors.ShortNameMaxLength)
+        if (trimmedShortName?.Length > ShortNameMaxLength)
         {
             return Result.Failure<(string, string?)>(OrganisationErrors.ShortNameTooLong);
         }
