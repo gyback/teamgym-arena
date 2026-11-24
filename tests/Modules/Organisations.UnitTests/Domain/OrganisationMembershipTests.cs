@@ -79,6 +79,20 @@ public sealed class OrganisationMembershipTests
     }
 
     [Fact]
+    public void AnArchivedOrganisationCannotAssignCoachesToTeams()
+    {
+        var club = Club(_clock);
+        var coach = club.AddMembership(_user, OrganisationRole.Coach, _clock).Value;
+        var team = NewTeam(club, _clock);
+        club.Archive();
+
+        var result = club.AssignCoachToTeam(coach.Id, team);
+
+        Assert.Equal(OrganisationErrors.Archived, result.Error);
+        Assert.Empty(coach.TeamIds);
+    }
+
+    [Fact]
     public void RemoveMembershipRemovesOnlyThatMembership()
     {
         var club = Club(_clock);
