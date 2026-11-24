@@ -175,6 +175,16 @@ public sealed class OrganisationTests
     }
 
     [Fact]
+    public void ChangeParentRequiresTheAncestorsOfAParentThatHasAParent()
+    {
+        var european = Federation(_clock);
+        var national = Federation(_clock, parent: european);
+
+        Assert.Throws<ArgumentException>(() => european.ChangeParent(national, ancestorsOfParent: []));
+        Assert.Null(european.ParentOrganisationId);
+    }
+
+    [Fact]
     public void ChangeParentRejectsAParentThatCannotHoldTheType()
     {
         var region = Region(_clock);

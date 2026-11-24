@@ -123,6 +123,9 @@ internal sealed class Organisation
     /// The IDs of every organisation above <paramref name="parent"/>, which the caller loads so that a cycle can be
     /// detected.
     /// </param>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="parent"/> has a parent of its own that <paramref name="ancestorsOfParent"/> does not contain.
+    /// </exception>
     public Result ChangeParent(Organisation? parent, IReadOnlyCollection<OrganisationId> ancestorsOfParent)
     {
         ArgumentNullException.ThrowIfNull(ancestorsOfParent);
@@ -134,6 +137,13 @@ internal sealed class Organisation
 
         if (parent is not null)
         {
+            if (parent.ParentOrganisationId is { } grandparentId && !ancestorsOfParent.Contains(grandparentId))
+            {
+                throw new ArgumentException(
+                    "The ancestors of the parent must include the parent's own parent, or a cycle could go undetected.",
+                    nameof(ancestorsOfParent));
+            }
+
             if (parent.Id == Id || ancestorsOfParent.Contains(Id))
             {
                 return Result.Failure(OrganisationErrors.HierarchyCycle);
