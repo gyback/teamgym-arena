@@ -115,6 +115,7 @@ In `src/Web`:
 
 ```shell
 npm ci
+npm run generate:api                 # regenerate the API types after dotnet build (see below)
 npm run typecheck                    # strict type check
 npm run lint                         # lint with zero warnings
 npm run format:check                 # formatting (npm run format fixes it)
@@ -132,6 +133,15 @@ npm run typecheck
 npm run format:check
 npm test
 ```
+
+### API contract
+
+`dotnet build` exports the API's OpenAPI 3.1 contract to `src/Api/openapi.json`, and `npm run generate:api`
+(in `src/Web`) generates the SPA's types in `src/Web/src/shared/api/schema.d.ts` from it
+([ADR-0005](docs/adr/0005-frontend-framework-and-api-contract.md)). When you change an endpoint, run both and
+commit both files. CI fails when either differs from what the build generates. Name every endpoint with
+`WithName()` (its operation ID) and map it on its module's route group, which calls `WithTags("<Module>")` (its
+tag).
 
 ### Tests
 

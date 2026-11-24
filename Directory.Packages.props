@@ -7,6 +7,7 @@
   <!-- ASP.NET Core and Microsoft.Extensions packages stay on the 10.x band that matches net10.0 (ADR-0004). -->
   <ItemGroup Label="Host">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.15" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.15" />
   </ItemGroup>
 
   <!-- Aspire hosting integrations stay on the band of the Aspire.AppHost.Sdk in src/AppHost. -->

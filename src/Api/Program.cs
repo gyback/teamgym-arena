@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+using TeamGym.Arena.Api.OpenApi;
 using TeamGym.Arena.Api.Spa;
 using TeamGym.Arena.Modules.Applications;
 using TeamGym.Arena.Modules.Competitions;
@@ -12,7 +14,11 @@ builder.AddServiceDefaults();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
-builder.Services.AddOpenApi();
+builder.Services.AddApiOpenApi();
+
+// The web defaults also read numbers from JSON strings, so the contract would describe every number as
+// `integer | string`. The API accepts JSON numbers only.
+builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict);
 
 builder.Services
     .AddUsersModule()
