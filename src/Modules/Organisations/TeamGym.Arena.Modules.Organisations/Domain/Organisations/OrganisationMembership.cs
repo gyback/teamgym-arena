@@ -10,7 +10,7 @@ namespace TeamGym.Arena.Modules.Organisations.Domain.Organisations;
 /// </summary>
 internal sealed class OrganisationMembership
 {
-    private readonly HashSet<TeamId> _teamIds = [];
+    private readonly List<CoachTeamAssignment> _teamAssignments = [];
 
     internal OrganisationMembership(
         OrganisationMembershipId id,
@@ -41,9 +41,19 @@ internal sealed class OrganisationMembership
     /// The teams a coach is assigned to. Only a <see cref="OrganisationRole.Coach"/> membership has team
     /// assignments; what an assignment allows is decided by the permission model (ADR-0008).
     /// </summary>
-    public IReadOnlyCollection<TeamId> TeamIds => _teamIds;
+    public IReadOnlyCollection<TeamId> TeamIds => [.. _teamAssignments.Select(assignment => assignment.TeamId)];
 
-    internal bool AssignTeam(TeamId teamId) => _teamIds.Add(teamId);
+    internal bool AssignTeam(TeamId teamId)
+    {
+        if (_teamAssignments.Exists(assignment => assignment.TeamId == teamId))
+        {
+            return false;
+        }
 
-    internal bool UnassignTeam(TeamId teamId) => _teamIds.Remove(teamId);
+        _teamAssignments.Add(new CoachTeamAssignment(Id, teamId));
+
+        return true;
+    }
+
+    internal bool UnassignTeam(TeamId teamId) => _teamAssignments.RemoveAll(assignment => assignment.TeamId == teamId) > 0;
 }

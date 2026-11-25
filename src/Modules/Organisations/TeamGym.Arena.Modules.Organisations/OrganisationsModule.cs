@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using TeamGym.Arena.Common.Persistence;
+using TeamGym.Arena.Modules.Organisations.Persistence;
 
 namespace TeamGym.Arena.Modules.Organisations;
 
@@ -13,12 +15,23 @@ public static class OrganisationsModule
     /// <summary>The route prefix that every Organisations endpoint is mapped under.</summary>
     public const string RoutePrefix = "/api/v1/organisations";
 
-    /// <summary>Registers the services of the Organisations module.</summary>
-    public static IServiceCollection AddOrganisationsModule(this IServiceCollection services)
+    /// <summary>Registers the services of the Organisations module, including its database.</summary>
+    public static IHostApplicationBuilder AddOrganisationsModule(this IHostApplicationBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(builder);
 
-        return services;
+        return builder.AddOrganisationsPersistence();
+    }
+
+    /// <summary>
+    /// Registers only the database of the Organisations module, in the <c>organisations</c> schema. The migration runner uses it
+    /// to migrate the schema without starting the module's other services (ADR-0007).
+    /// </summary>
+    public static IHostApplicationBuilder AddOrganisationsPersistence(this IHostApplicationBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddModuleDbContext<OrganisationsDbContext>(OrganisationsDbContext.Schema);
     }
 
     /// <summary>

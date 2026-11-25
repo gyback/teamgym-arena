@@ -10,10 +10,10 @@ TeamGym Arena is an open-source administration tool for
 [`README.md`](README.md) for goals and scope, and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the full
 contribution workflow.
 
-> **Project status: pre-alpha.** The backend host, Aspire AppHost, shared kernel, empty MVP module projects (#18),
-> the architecture tests (#19) and the web app shell with its E2E harness (#21) exist; there are no domain
-> features yet. The rest of the layout and commands below are those decided in the ADRs. They take effect as the
-> remaining scaffolding issue (#27) lands, and that PR updates this file with the real commands.
+> **Project status: pre-alpha.** The backend host, Aspire AppHost, shared kernel, MVP module projects (#18), the
+> architecture tests (#19), the web app shell with its E2E harness (#21), the Organisations domain model (#24) and
+> the PostgreSQL persistence with its migration runner and Testcontainers fixture (#27) exist. There are no
+> endpoints yet.
 
 ## Guardrails
 
@@ -106,6 +106,11 @@ The architecture tests enforce most of these. Breaking one is an ADR question, n
   mediator library. Name every endpoint with `WithName()`, which becomes its OpenAPI operation ID, and tag it
   with its module through `WithTags("<Module>")` on the module's route group.
 - Query handlers use `.AsNoTracking()` projections. No generic repositories.
+- A module's `DbContext` derives from `ModuleDbContext` and is registered with `AddModuleDbContext` in the module's
+  `Add<Module>Persistence()`, which puts its tables in the module's schema with snake_case names. Map entities in
+  `Persistence/Configurations/` with explicit `IEntityTypeConfiguration<T>` classes; the domain model never uses EF
+  Core. Give aggregate roots `HasXminConcurrencyToken()`, store enums with `StoreAsName()`, and `AutoInclude()` an
+  aggregate's child collections so that it always loads whole.
 - IDs are strongly typed `readonly record struct`s backed by UUIDv7. Timestamps are UTC `DateTimeOffset`
   from `TimeProvider`.
 - Never call `Database.MigrateAsync()` from the API. Schema changes are per-module EF Core migrations and
@@ -149,6 +154,7 @@ checks ([ADR-0003](docs/adr/0003-engineering-workflow-and-quality-gates.md)).
 | Build the backend (warnings are errors) | `dotnet build` |
 | Check .NET formatting | `dotnet format --verify-no-changes` |
 | Run backend tests (needs Docker for Testcontainers) | `dotnet test` |
+| Add an EF Core migration after changing a module's model | `dotnet ef migrations add <Name> --project src/Modules/<Module>/TeamGym.Arena.Modules.<Module> --startup-project src/MigrationService --context <Module>DbContext --output-dir Persistence/Migrations` (after `dotnet tool restore`) |
 | Install frontend dependencies | `npm ci` (in `src/Web`) |
 | Regenerate the API types after `dotnet build` exported `src/Api/openapi.json` | `npm run generate:api` (in `src/Web`) |
 | Type-check the frontend (strict) | `npm run typecheck` (in `src/Web`) |

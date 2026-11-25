@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using TeamGym.Arena.Api.IntegrationTests.Infrastructure;
 
 namespace TeamGym.Arena.Api.IntegrationTests;
 
@@ -8,7 +9,7 @@ namespace TeamGym.Arena.Api.IntegrationTests;
 /// The API serves the built SPA from its web root in production (ADR-0005). These tests use a temporary web
 /// root that looks like the Vite output.
 /// </summary>
-public sealed class SpaHostingTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
+public sealed class SpaHostingTests : IClassFixture<ApiFactory>, IDisposable
 {
     private const string IndexHtml = "<!doctype html><title>TeamGym Arena</title><div id=\"root\"></div>";
     private const string HashedAsset = "/assets/index-AbC123.js";
@@ -17,7 +18,7 @@ public sealed class SpaHostingTests : IClassFixture<WebApplicationFactory<Progra
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
 
-    public SpaHostingTests(WebApplicationFactory<Program> factory)
+    public SpaHostingTests(ApiFactory factory)
     {
         ArgumentNullException.ThrowIfNull(factory);
 

@@ -179,7 +179,7 @@ jobs:
           retention-days: 14
 
   # Playwright against the built SPA served by `vite preview` (tests/E2E/playwright.config.ts). Full-stack
-  # journeys against the API join this job once sign-in (#32) and persistence (#27) exist.
+  # journeys against the API join this job once sign-in (#32) exists.
   e2e:
     name: End-to-end tests
     runs-on: ubuntu-latest
