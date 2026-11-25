@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using TeamGym.Arena.Common.Persistence;
+using TeamGym.Arena.Modules.Competitions.Persistence;
 
 namespace TeamGym.Arena.Modules.Competitions;
 
@@ -13,12 +15,23 @@ public static class CompetitionsModule
     /// <summary>The route prefix that every Competitions endpoint is mapped under.</summary>
     public const string RoutePrefix = "/api/v1/competitions";
 
-    /// <summary>Registers the services of the Competitions module.</summary>
-    public static IServiceCollection AddCompetitionsModule(this IServiceCollection services)
+    /// <summary>Registers the services of the Competitions module, including its database.</summary>
+    public static IHostApplicationBuilder AddCompetitionsModule(this IHostApplicationBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(builder);
 
-        return services;
+        return builder.AddCompetitionsPersistence();
+    }
+
+    /// <summary>
+    /// Registers only the database of the Competitions module, in the <c>competitions</c> schema. The migration runner uses it
+    /// to migrate the schema without starting the module's other services (ADR-0007).
+    /// </summary>
+    public static IHostApplicationBuilder AddCompetitionsPersistence(this IHostApplicationBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddModuleDbContext<CompetitionsDbContext>(CompetitionsDbContext.Schema);
     }
 
     /// <summary>

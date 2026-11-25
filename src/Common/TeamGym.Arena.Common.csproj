@@ -2,7 +2,15 @@
 
   <!--
     Shared kernel (ADR-0004). Keep it small and free of business workflows: TeamGym primitives,
-    strongly typed ID support, Result and Error, and handler and event abstractions only.
+    strongly typed ID support, Result and Error, handler and event abstractions, and the EF Core conventions that
+    every module's persistence shares (ADR-0007). Domain models never use the Persistence namespace; the
+    architecture tests enforce that.
   -->
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="EFCore.NamingConventions" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+  </ItemGroup>
 
 </Project>

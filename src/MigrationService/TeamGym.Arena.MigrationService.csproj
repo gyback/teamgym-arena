@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <!--
+    Applies the EF Core migrations of every module, then exits: 0 on success, non-zero on failure (ADR-0007,
+    ADR-0009). AppHost runs it before the API starts. Deployments run it as the `migrations` job before they roll
+    out a new API version. It is also the startup project for `dotnet ef`, which needs the Design package.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Also compiled against, for the design-time services in DesignTime/. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Common/TeamGym.Arena.Common.csproj" />
+    <ProjectReference Include="../ServiceDefaults/TeamGym.Arena.ServiceDefaults.csproj" />
+    <ProjectReference Include="../Modules/Users/TeamGym.Arena.Modules.Users/TeamGym.Arena.Modules.Users.csproj" />
+    <ProjectReference Include="../Modules/Organisations/TeamGym.Arena.Modules.Organisations/TeamGym.Arena.Modules.Organisations.csproj" />
+    <ProjectReference Include="../Modules/Competitions/TeamGym.Arena.Modules.Competitions/TeamGym.Arena.Modules.Competitions.csproj" />
+    <ProjectReference Include="../Modules/Applications/TeamGym.Arena.Modules.Applications/TeamGym.Arena.Modules.Applications.csproj" />
+    <ProjectReference Include="../Modules/Scheduling/TeamGym.Arena.Modules.Scheduling/TeamGym.Arena.Modules.Scheduling.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,7 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!--
+    HTTP and persistence tests against the real API host and a real PostgreSQL 17 database, which Testcontainers
+    starts once for the whole assembly (ADR-0003, ADR-0007). They need a Docker engine.
+  -->
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+    <PackageReference Include="Respawn" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
   </ItemGroup>
 
   <ItemGroup>

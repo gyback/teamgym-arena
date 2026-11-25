@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="TeamGym.Arena.Modules.Organisations.UnitTests" />
+    <InternalsVisibleTo Include="TeamGym.Arena.Api.IntegrationTests" />
   </ItemGroup>
 
 </Project>

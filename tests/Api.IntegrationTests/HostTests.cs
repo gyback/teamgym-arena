@@ -1,14 +1,17 @@
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
+using TeamGym.Arena.Api.IntegrationTests.Infrastructure;
+using TeamGym.Arena.Common.Persistence;
 
 namespace TeamGym.Arena.Api.IntegrationTests;
 
-public sealed class HostTests(WebApplicationFactory<Program> factory)
-    : IClassFixture<WebApplicationFactory<Program>>, IDisposable
+public sealed class HostTests(ApiFactory factory)
+    : IClassFixture<ApiFactory>, IDisposable
 {
     private readonly HttpClient _client = factory.CreateClient();
 
@@ -39,6 +42,26 @@ public sealed class HostTests(WebApplicationFactory<Program> factory)
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal("Healthy", await response.Content.ReadAsStringAsync(CancellationToken));
+    }
+
+    [Fact]
+    public async Task ReadinessReportsUnhealthyWhileTheDatabaseIsUnreachableButLivenessDoesNot()
+    {
+        // Port 1 on the loopback interface refuses connections, so every module's database check fails fast.
+        using var offlineFactory = factory.WithWebHostBuilder(host => host.UseSetting(
+            $"ConnectionStrings:{ModuleDatabaseExtensions.ConnectionStringName}", "Host=127.0.0.1;Port=1;Database=teamgym_arena;Username=teamgym;Timeout=2"));
+        using var client = offlineFactory.CreateClient();
+
+        var stopwatch = Stopwatch.StartNew();
+        using var health = await client.GetAsync(new Uri("/health", UriKind.Relative), CancellationToken);
+        stopwatch.Stop();
+        using var alive = await client.GetAsync(new Uri("/alive", UriKind.Relative), CancellationToken);
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, health.StatusCode);
+        // The retrying execution strategy must not keep a platform probe waiting.
+        Assert.InRange(stopwatch.Elapsed, TimeSpan.Zero, ModuleDatabaseExtensions.HealthCheckTimeout * 3);
+        Assert.Equal("Unhealthy", await health.Content.ReadAsStringAsync(CancellationToken));
+        Assert.Equal(HttpStatusCode.OK, alive.StatusCode);
     }
 
     [Fact]

@@ -8,12 +8,13 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using TeamGym.Arena.Api.IntegrationTests.Infrastructure;
 using TeamGym.Arena.Api.OpenApi;
 
 namespace TeamGym.Arena.Api.IntegrationTests;
 
-public sealed class OpenApiContractTests(WebApplicationFactory<Program> factory)
-    : IClassFixture<WebApplicationFactory<Program>>
+public sealed class OpenApiContractTests(ApiFactory factory)
+    : IClassFixture<ApiFactory>
 {
     private const string DocumentPath = "/openapi/v1.json";
     private const string ProblemDetailsRef = "#/components/schemas/ProblemDetails";

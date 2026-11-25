@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using TeamGym.Arena.Common.Persistence;
+using TeamGym.Arena.Modules.Applications.Persistence;
 
 namespace TeamGym.Arena.Modules.Applications;
 
@@ -13,12 +15,23 @@ public static class ApplicationsModule
     /// <summary>The route prefix that every Applications endpoint is mapped under.</summary>
     public const string RoutePrefix = "/api/v1/applications";
 
-    /// <summary>Registers the services of the Applications module.</summary>
-    public static IServiceCollection AddApplicationsModule(this IServiceCollection services)
+    /// <summary>Registers the services of the Applications module, including its database.</summary>
+    public static IHostApplicationBuilder AddApplicationsModule(this IHostApplicationBuilder builder)
     {
-        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(builder);
 
-        return services;
+        return builder.AddApplicationsPersistence();
+    }
+
+    /// <summary>
+    /// Registers only the database of the Applications module, in the <c>applications</c> schema. The migration runner uses it
+    /// to migrate the schema without starting the module's other services (ADR-0007).
+    /// </summary>
+    public static IHostApplicationBuilder AddApplicationsPersistence(this IHostApplicationBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddModuleDbContext<ApplicationsDbContext>(ApplicationsDbContext.Schema);
     }
 
     /// <summary>

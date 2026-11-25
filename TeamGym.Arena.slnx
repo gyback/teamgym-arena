@@ -3,6 +3,7 @@
     <Project Path="src/Api/TeamGym.Arena.Api.csproj" />
     <Project Path="src/AppHost/TeamGym.Arena.AppHost.csproj" />
     <Project Path="src/Common/TeamGym.Arena.Common.csproj" />
+    <Project Path="src/MigrationService/TeamGym.Arena.MigrationService.csproj" />
     <Project Path="src/ServiceDefaults/TeamGym.Arena.ServiceDefaults.csproj" />
   </Folder>
   <Folder Name="/src/Modules/">

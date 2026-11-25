@@ -49,10 +49,12 @@ dotnet run --project src/AppHost
 No cloud account is needed. Local sign-in uses seeded test users in Keycloak
 ([ADR-0008](docs/adr/0008-identity-authentication-and-authorisation.md)).
 
-Today the AppHost starts the API, the web app (the Vite dev server, which installs its npm packages on first
-start) and the Aspire dashboard. Open the `web` URL from the dashboard: the dev server proxies `/api`, `/bff`
-and `/hubs` to the API, so the browser sees one origin as it does in production. PostgreSQL (#27), Keycloak
-(#32) and Mailpit (#38) are added by those issues, and their pull requests update this section.
+Today the AppHost starts a PostgreSQL 17 container, the migration runner (`src/MigrationService`, which applies
+every module's migrations and exits), the API (once the migrations have succeeded), the web app (the Vite dev
+server, which installs its npm packages on first start) and the Aspire dashboard. Open the `web` URL from the
+dashboard: the dev server proxies `/api`, `/bff` and `/hubs` to the API, so the browser sees one origin as it does
+in production. The database starts empty on every run. Keycloak (#32) and Mailpit (#38) are added by those issues,
+and their pull requests update this section.
 
 ## Workflow
 

@@ -20,7 +20,9 @@ builder.Services.AddApiOpenApi();
 // `integer | string`. The API accepts JSON numbers only.
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict);
 
-builder.Services
+// Each module registers its own services and its DbContext. The API never migrates the schema: the migration
+// runner in src/MigrationService does that before the API starts (ADR-0007).
+builder
     .AddUsersModule()
     .AddOrganisationsModule()
     .AddCompetitionsModule()

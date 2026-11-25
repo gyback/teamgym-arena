@@ -16,7 +16,7 @@ internal sealed class Team
 {
     public const int NameMaxLength = 100;
 
-    private readonly HashSet<GymnastId> _gymnastIds = [];
+    private readonly List<TeamMember> _members = [];
 
     private Team(TeamId id, OrganisationId organisationId, string name, Section section)
     {
@@ -35,7 +35,7 @@ internal sealed class Team
 
     public Section Section { get; private set; }
 
-    public IReadOnlyCollection<GymnastId> GymnastIds => _gymnastIds;
+    public IReadOnlyCollection<GymnastId> GymnastIds => [.. _members.Select(member => member.GymnastId)];
 
     /// <summary>Creates a team owned by <paramref name="club"/>, which must be an active club.</summary>
     public static Result<Team> Create(Organisation club, string? name, Section section, TimeProvider timeProvider)
@@ -88,11 +88,20 @@ internal sealed class Team
             return Result.Failure(GymnastErrors.NotFound);
         }
 
-        return _gymnastIds.Add(gymnast.Id) ? Result.Success() : Result.Failure(TeamErrors.GymnastAlreadyInTeam);
+        if (_members.Exists(member => member.GymnastId == gymnast.Id))
+        {
+            return Result.Failure(TeamErrors.GymnastAlreadyInTeam);
+        }
+
+        _members.Add(new TeamMember(Id, gymnast.Id));
+
+        return Result.Success();
     }
 
     public Result RemoveGymnast(GymnastId gymnastId) =>
-        _gymnastIds.Remove(gymnastId) ? Result.Success() : Result.Failure(TeamErrors.GymnastNotInTeam);
+        _members.RemoveAll(member => member.GymnastId == gymnastId) > 0
+            ? Result.Success()
+            : Result.Failure(TeamErrors.GymnastNotInTeam);
 
     private static Result<string> ValidateName(string? name)
     {
