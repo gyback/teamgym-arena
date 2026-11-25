@@ -4,6 +4,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../../../Common/TeamGym.Arena.Common.csproj" />
+    <ProjectReference Include="../../Organisations/TeamGym.Arena.Modules.Organisations.Contracts/TeamGym.Arena.Modules.Organisations.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
