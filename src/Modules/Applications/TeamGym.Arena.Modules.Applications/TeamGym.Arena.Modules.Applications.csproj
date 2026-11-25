@@ -7,6 +7,8 @@
   <ItemGroup>
     <ProjectReference Include="../../../Common/TeamGym.Arena.Common.csproj" />
     <ProjectReference Include="../TeamGym.Arena.Modules.Applications.Contracts/TeamGym.Arena.Modules.Applications.Contracts.csproj" />
+    <ProjectReference Include="../../Competitions/TeamGym.Arena.Modules.Competitions.Contracts/TeamGym.Arena.Modules.Competitions.Contracts.csproj" />
+    <ProjectReference Include="../../Organisations/TeamGym.Arena.Modules.Organisations.Contracts/TeamGym.Arena.Modules.Organisations.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
